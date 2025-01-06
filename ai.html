@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TypeHash Chatbot</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        #chat-container {
+            width: 100%;
+            max-width: 600px;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        #chat-header {
+            background: #007BFF;
+            color: #fff;
+            padding: 15px;
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+        }
+        #chat-body {
+            padding: 20px;
+            height: 400px;
+            overflow-y: auto;
+            background-color: #f9f9f9;
+            border-bottom: 1px solid #ddd;
+        }
+        #chat-input {
+            padding: 10px;
+            border: none;
+            width: calc(100% - 20px);
+            border-radius: 10px;
+            outline: none;
+            font-size: 16px;
+        }
+        #chat-form {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px;
+            background: #f9f9f9;
+            border-top: 1px solid #ddd;
+        }
+        .chat-message {
+            margin-bottom: 15px;
+        }
+        .user-message {
+            text-align: right;
+            color: #007BFF;
+        }
+        .bot-message {
+            text-align: left;
+            color: green;
+        }
+        #send-button {
+            padding: 10px 20px;
+            background-color: #007BFF;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        #send-button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div id="chat-container">
+        <div id="chat-header">TypeHash Chatbot</div>
+        <div id="chat-body">
+            <!-- Chat messages will appear here -->
+        </div>
+        <div id="chat-form">
+            <input type="text" id="chat-input" placeholder="Type a message..." autocomplete="off">
+            <button id="send-button">Send</button>
+        </div>
+    </div>
+
+    <script>
+        const chatBody = document.getElementById('chat-body');
+        const chatInput = document.getElementById('chat-input');
+        const sendButton = document.getElementById('send-button');
+
+        // JSON-based chatbot responses
+        const chatbotResponses = {
+    "hello": "Hi there! How can I assist you today?",
+    "what is your name": "I am TypeHash, your friendly AI chatbot!",
+    "tell me a joke": "Why don't skeletons fight each other? They don't have the guts!",
+    "what is the weather like today": "I am not sure about the weather right now, but you can check a weather service for the latest updates!",
+    "what is the meaning of life": "That's a great philosophical question! Many believe the meaning of life is to seek happiness and fulfillment.",
+    "can you help me with math": "Of course! What math problem would you like help with?",
+    "what is 2 + 2": "2 + 2 equals 4.",
+    "how do you work": "I analyze your inputs and generate responses based on patterns and learned information.",
+    "tell me a fun fact": "Did you know that honey never spoils? Archaeologists have found pots of honey in ancient tombs that are over 3,000 years old!",
+    "goodbye": "Goodbye! It was great chatting with you. Have a wonderful day!",
+    "default": "Sorry, I didn't understand that. Can you please rephrase?",
+    "what is the chemical formula for water": "H2O",
+    "what planet is known as the red planet": "Mars",
+    "what is the process by which plants make their own food": "Photosynthesis",
+    "who developed the theory of relativity": "Albert Einstein",
+    "what is the hardest natural substance on earth": "Diamond",
+    "what is the main gas in earth's atmosphere": "Nitrogen",
+    "what is the chemical symbol for gold": "Au",
+    "what part of the cell contains the genetic material": "Nucleus",
+    "what is the boiling point of water in celsius": "100°C",
+    "what is the most common type of rock found on earth": "Igneous rock",
+    "what is the capital of France": "Paris",
+    "what is the largest mammal": "The blue whale is the largest mammal.",
+    "how many continents are there": "There are seven continents.",
+    "what is the speed of light": "The speed of light is approximately 299,792 kilometers per second.",
+    "what is the tallest mountain in the world": "Mount Everest is the tallest mountain.",
+    "what is the smallest unit of life": "The cell is the smallest unit of life.",
+    "how many bones are in the human body": "There are 206 bones in the adult human body.",
+    "what is the smallest planet in the solar system": "Mercury is the smallest planet.",
+    "what is the largest organ in the human body": "The skin is the largest organ.",
+    "what is the chemical formula for carbon dioxide": "CO2",
+    "who wrote 'Romeo and Juliet'": "William Shakespeare wrote 'Romeo and Juliet.'",
+    "what is the national bird of the United States": "The bald eagle is the national bird of the United States.",
+    "what is the square root of 64": "The square root of 64 is 8.",
+    "what is the capital of Japan": "Tokyo is the capital of Japan.",
+    "how many colors are in a rainbow": "There are seven colors in a rainbow.",
+    "what is the hottest planet in the solar system": "Venus is the hottest planet.",
+    "what is the freezing point of water in celsius": "0°C",
+    "who painted the Mona Lisa": "Leonardo da Vinci painted the Mona Lisa.",
+    "what is the primary language spoken in Brazil": "Portuguese is the primary language.",
+    "what is the largest desert in the world": "The Sahara Desert is the largest hot desert.",
+    "who is known as the father of computers": "Charles Babbage is known as the father of computers.",
+    "what is the currency of the United States": "The US dollar is the currency.",
+    "what is the capital of Italy": "Rome is the capital of Italy.",
+    "what gas do humans exhale": "Humans exhale carbon dioxide.",
+    "what is the tallest animal in the world": "The giraffe is the tallest animal.",
+    "what is the first element on the periodic table": "Hydrogen is the first element.",
+  "what is the capital of afghanistan?": "kabul",
+  "what is the currency of afghanistan?": "afghan afghani",
+  "what is the official language of afghanistan?": "pashto, dari",
+  "what is the capital of albania?": "tirana",
+  "what is the currency of albania?": "albanian lek",
+  "what is the official language of albania?": "albanian",
+  "what is the capital of algeria?": "algiers",
+  "what is the currency of algeria?": "algerian dinar",
+  "what is the official language of algeria?": "arabic, berber",
+  "what is the capital of andorra?": "andorra la vella",
+  "what is the currency of andorra?": "euro",
+  "what is the official language of andorra?": "catalan",
+  "what is the capital of angola?": "luanda",
+  "what is the currency of angola?": "angolan kwanza",
+  "what is the official language of angola?": "portuguese",
+  "what is the capital of argentina?": "buenos aires",
+  "what is the currency of argentina?": "argentine peso",
+  "what is the official language of argentina?": "spanish",
+  "what is the capital of armenia?": "yerevan",
+  "what is the currency of armenia?": "armenian dram",
+  "what is the official language of armenia?": "armenian",
+  "what is the capital of australia?": "canberra",
+  "what is the currency of australia?": "australian dollar",
+  "what is the official language of australia?": "english",
+  "what is the capital of austria?": "vienna",
+  "what is the currency of austria?": "euro",
+  "what is the official language of austria?": "german",
+  "what is the capital of azerbaijan?": "baku",
+  "what is the currency of azerbaijan?": "azerbaijani manat",
+  "what is the official language of azerbaijan?": "azerbaijani",
+  "what is the capital of bahamas?": "nassau",
+  "what is the currency of bahamas?": "bahamian dollar",
+  "what is the official language of bahamas?": "english",
+  "what is the capital of bahrain?": "manama",
+  "what is the currency of bahrain?": "bahraini dinar",
+  "what is the official language of bahrain?": "arabic",
+  "what is the capital of bangladesh?": "dhaka",
+  "what is the currency of bangladesh?": "bangladeshi taka",
+  "what is the official language of bangladesh?": "bengali",
+  "what is the capital of barbados?": "bridgetown",
+  "what is the currency of barbados?": "barbadian dollar",
+  "what is the official language of barbados?": "english",
+  "what is the capital of belarus?": "minsk",
+  "what is the currency of belarus?": "belarusian ruble",
+  "what is the official language of belarus?": "belarusian, russian",
+  "what is the capital of belgium?": "brussels",
+  "what is the currency of belgium?": "euro",
+  "what is the official language of belgium?": "dutch, french, german",
+  "what is the capital of belize?": "belmopan",
+  "what is the currency of belize?": "belize dollar",
+  "what is the official language of belize?": "english",
+  "what is the capital of benin?": "porto-novo",
+  "what is the currency of benin?": "west african cfa franc",
+  "what is the official language of benin?": "french",
+  "what is the capital of bhutan?": "thimphu",
+  "what is the currency of bhutan?": "bhutanese ngultrum",
+  "what is the official language of bhutan?": "dzongkha",
+  "what is the capital of bolivia?": "sucre (constitutional), la paz (administrative)",
+  "what is the currency of bolivia?": "boliviano",
+  "what is the official language of bolivia?": "spanish, quechua, aymara, and 33 other official languages",
+  "what is the capital of botswana?": "gaborone",
+  "what is the currency of botswana?": "botswana pula",
+  "what is the official language of botswana?": "english, tswana",
+  "what is the capital of brazil?": "brasília",
+  "what is the currency of brazil?": "brazilian real",
+  "what is the official language of brazil?": "portuguese",
+  "what is the capital of brunei?": "bandar seri begawan",
+  "what is the currency of brunei?": "brunei dollar",
+  "what is the official language of brunei?": "malay",
+  "what is the capital of bulgaria?": "sofia",
+  "what is the currency of bulgaria?": "bulgarian lev",
+  "what is the official language of bulgaria?": "bulgarian",
+  "what is the capital of burkina faso?": "ouagadougou",
+  "what is the currency of burkina faso?": "west african cfa franc",
+  "what is the official language of burkina faso?": "french",
+  "what is the capital of burundi?": "gitega",
+  "what is the currency of burundi?": "burundian franc",
+  "what is the official language of burundi?": "kirundi, french",
+  "what is the capital of cambodia?": "phnom penh",
+  "what is the currency of cambodia?": "cambodian riel",
+  "what is the official language of cambodia?": "khmer",
+  "what is the capital of cameroon?": "yaoundé",
+  "what is the currency of cameroon?": "central african cfa franc",
+  "what is the official language of cameroon?": "english, french",
+  "what is the capital of canada?": "ottawa",
+  "what is the currency of canada?": "canadian dollar",
+  "what is the official language of canada?": "english, french",
+  "what is the capital of chad?": "n'djamena",
+  "what is the currency of chad?": "central african cfa franc",
+  "what is the official language of chad?": "french, arabic",
+  "what is the capital of chile?": "santiago",
+  "what is the currency of chile?": "chilean peso",
+  "what is the official language of chile?": "spanish",
+  "what is the capital of china?": "beijing",
+  "what is the currency of china?": "renminbi (yuan)",
+  "what is the official language of china?": "mandarin",
+  "what is the capital of colombia?": "bogotá",
+  "what is the currency of colombia?": "colombian peso",
+  "what is the official language of colombia?": "spanish",
+  "what is the capital of costa rica?": "san josé",
+  "what is the currency of costa rica?": "costa rican colón",
+  "what is the official language of costa rica?": "spanish",
+  "what is the capital of croatia?": "zagreb",
+  "what is the currency of croatia?": "euro",
+  "what is the official language of croatia?": "croatian",
+  "what is the capital of cuba?": "havana",
+  "what is the currency of cuba?": "cuban peso",
+  "what is the official language of cuba?": "spanish",
+  "what is the capital of cyprus?": "nicosia",
+  "what is the currency of cyprus?": "euro",
+  "what is the official language of cyprus?": "greek, turkish",
+  "what is the capital of czech republic?": "prague",
+  "what is the currency of czech republic?": "czech koruna",
+  "what is the official language of czech republic?": "czech",
+  "what is the capital of denmark?": "copenhagen",
+  "what is the currency of denmark?": "danish krone",
+  "what is the official language of denmark?": "danish",
+  "what is the capital of djibouti?": "djibouti",
+  "what is the currency of djibouti?": "djiboutian franc",
+  "what is the official language of djibouti?": "french, arabic",
+  "what is the capital of dominican republic?": "santo domingo",
+  "what is the currency of dominican republic?": "dominican peso",
+  "what is the official language of dominican republic?": "spanish",
+  "what is the capital of ecuador?": "quito",
+  "what is the currency of ecuador?": "united states dollar",
+  "what is the official language of ecuador?": "spanish",
+  "what is the capital of egypt?": "cairo",
+  "what is the currency of egypt?": "egyptian pound",
+  "what is the official language of egypt?": "arabic",
+  "what is the capital of el salvador?": "san salvador",
+  "what is the currency of el salvador?": "united states dollar",
+  "what is the official language of el salvador?": "spanish",
+  "what is the capital of equatorial guinea?": "malabo",
+  "what is the currency of equatorial guinea?": "central african cfa franc",
+  "what is the official language of equatorial guinea?": "spanish, french, portuguese",
+  "what is the capital of eritrea?": "asmara",
+  "what is the currency of eritrea?": "nakfa",
+  "what is the official language of eritrea?": "tigrinya, arabic, english",
+  "what is the capital of estonia?": "tallinn",
+  "what is the currency of estonia?": "euro",
+  "what is the official language of estonia?": "estonian",
+  "what is the capital of eswatini?": "mbabane (administrative), lobamba (legislative)",
+  "what is the currency of eswatini?": "swazi lilangeni",
+  "what is the official language of eswatini?": "swazi, english"
+};
+
+        // Event listener for sending messages
+        sendButton.addEventListener('click', () => {
+            const userMessage = chatInput.value.trim();
+            if (userMessage) {
+                displayMessage(userMessage, 'user-message');
+                chatInput.value = '';
+
+                // Get bot response based on the JSON data
+                const botResponse = getBotResponse(userMessage);
+                displayMessage(botResponse, 'bot-message');
+            }
+        });
+
+        // Display message function
+        function displayMessage(message, classType) {
+            const messageElement = document.createElement('div');
+            messageElement.classList.add('chat-message', classType);
+            messageElement.innerText = message;
+            chatBody.appendChild(messageElement);
+            chatBody.scrollTop = chatBody.scrollHeight;
+        }
+
+        // Get bot response based on input
+        function getBotResponse(input) {
+            const normalizedInput = input.trim().toLowerCase();  // Trim and convert to lowercase
+
+            // Check if the input matches a predefined response
+            return chatbotResponses[normalizedInput] || chatbotResponses["default"];
+        }
+    </script>
+</body>
+</html>
