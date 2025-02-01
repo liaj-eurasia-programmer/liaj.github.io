@@ -3,109 +3,58 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TypeHash Chatbot</title>
+    <title>Interactive Chatbot</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            margin: 0;
-            padding: 20px;
-            background-color: #f4f4f4;
-        }
-        #chat-container {
-            width: 100%;
-            max-width: 600px;
-            background: #fff;
-            border-radius: 10px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            overflow: hidden;
-        }
-        #chat-header {
-            background: #007BFF;
-            color: #fff;
-            padding: 15px;
-            text-align: center;
-            font-size: 24px;
-            font-weight: bold;
-        }
-        #chat-body {
-            padding: 20px;
-            height: 400px;
-            overflow-y: auto;
-            background-color: #f9f9f9;
-            border-bottom: 1px solid #ddd;
-        }
-        #chat-input {
-            padding: 10px;
-            border: none;
-            width: calc(100% - 20px);
-            border-radius: 10px;
-            outline: none;
-            font-size: 16px;
-        }
-        #chat-form {
-            display: flex;
-            justify-content: space-between;
-            padding: 10px;
-            background: #f9f9f9;
-            border-top: 1px solid #ddd;
-        }
-        .chat-message {
-            margin-bottom: 15px;
-        }
-        .user-message {
-            text-align: right;
-            color: #007BFF;
-        }
-        .bot-message {
-            text-align: left;
-            color: green;
-        }
-        #send-button {
-            padding: 10px 20px;
-            background-color: #007BFF;
-            color: #fff;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        #send-button:hover {
-            background-color: #0056b3;
-        }
+        body { font-family: Arial, sans-serif; background: #f5f5f5; text-align: center; margin: 0; }
+        .chat-container { width: 400px; margin: 20px auto; background: white; box-shadow: 0 0 10px rgba(0,0,0,0.1); border-radius: 10px; overflow: hidden; }
+        .chat-header { background: #007bff; color: white; padding: 10px; font-size: 18px; }
+        .chat-body { height: 400px; overflow-y: auto; padding: 10px; }
+        .chat-message { margin: 10px 0; padding: 10px; border-radius: 5px; }
+        .user-message { background: #007bff; color: white; text-align: right; }
+        .bot-message { background: #e9ecef; color: black; text-align: left; }
+        .chat-footer { display: flex; padding: 10px; background: white; border-top: 1px solid #ddd; }
+        input { flex: 1; padding: 10px; border: 1px solid #ddd; border-radius: 5px; }
+        button { padding: 10px; background: #007bff; color: white; border: none; cursor: pointer; }
     </style>
 </head>
 <body>
-    <div id="chat-container">
-        <div id="chat-header">TypeHash Chatbot</div>
-        <div id="chat-body">
-            <!-- Chat messages will appear here -->
-        </div>
-        <div id="chat-form">
-            <input type="text" id="chat-input" placeholder="Type a message..." autocomplete="off">
-            <button id="send-button">Send</button>
-        </div>
+
+<div class="chat-container">
+    <div class="chat-header">TypeHash AI</div>
+    <div class="chat-body" id="chatBody"></div>
+    <div class="chat-footer">
+        <input type="text" id="chatInput" placeholder="Type a message...">
+        <button id="sendButton">Send</button>
     </div>
-    <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-4XT98VTRTK"></script>
+</div>
+
 <script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
+    const chatbotResponses = {
+        "what is python":    ` <h1>Introduction to Python</h1>
+    <p>Python is a high-level, interpreted programming language known for its simplicity and readability. It is widely used in various fields, including web development, data analysis, machine learning, automation, and scientific computing. Python's design emphasizes code readability and a clean, easy-to-understand syntax, making it a great choice for both beginners and experienced developers.</p>
 
-  gtag('config', 'G-4XT98VTRTK');
-</script>
-    <script>
-        const chatBody = document.getElementById('chat-body');
-        const chatInput = document.getElementById('chat-input');
-        const sendButton = document.getElementById('send-button');
+    <h2>Some key features of Python include:</h2>
+    <ul>
+        <li>Easy-to-learn syntax</li>
+        <li>Extensive standard library and third-party packages</li>
+        <li>Supports multiple programming paradigms, including procedural, object-oriented, and functional programming</li>
+        <li>Cross-platform, meaning it works on Windows, macOS, and Linux</li>
+    </ul>
 
-        // JSON-based chatbot responses
-        const chatbotResponses = {
-    "hello": "Hi there! How can I assist you today?",
+    <h2>Python is often used for:</h2>
+    <ul>
+        <li>Web development (e.g., Django, Flask)</li>
+        <li>Data analysis and visualization (e.g., Pandas, Matplotlib)</li>
+        <li>Machine learning and artificial intelligence (e.g., TensorFlow, scikit-learn)</li>
+        <li>Scripting and automation tasks</li>
+    </ul>
+
+    <p>Would you like to know more about Python's features or how to start programming with it?</p>`,
+        "hello": "<h3>👋 Hello!</h3><p>Hi there! How can I assist you today?</p>",
+        "what is ai": "<h3>🤖 What is Artificial Intelligence?</h3><p>Artificial Intelligence (AI) refers to the simulation of human intelligence in machines. It includes Machine Learning, Natural Language Processing, and more.</p><img src='https://upload.wikimedia.org/wikipedia/commons/1/1c/Artificial_Intelligence_Logo.png' alt='AI Image' width='100%'>",
+        "who is albert einstein": "<h3>🧠 Albert Einstein</h3><p>Albert Einstein was a theoretical physicist known for developing the <b>Theory of Relativity</b>. His famous equation <i>E = mc²</i> changed physics forever.</p><img src='https://upload.wikimedia.org/wikipedia/commons/d/d3/Albert_Einstein_Head.jpg' alt='Einstein' width='100%'>",
+        "default": "<h3>🤔 I don't understand...</h3><p>I'm still learning! Try asking about AI, science, or famous personalities.</p>",
+            "hello": "Hi there! How can I assist you today?",
     "what is your name": "I am TypeHash, your friendly AI chatbot!",
     "tell me a joke": "Why don't skeletons fight each other? They don't have the guts!",
     "what is the weather like today": "I am not sure about the weather right now, but you can check a weather service for the latest updates!",
@@ -296,37 +245,36 @@
   "what is the capital of eswatini?": "mbabane (administrative), lobamba (legislative)",
   "what is the currency of eswatini?": "swazi lilangeni",
   "what is the official language of eswatini?": "swazi, english"
-};
+    };
 
-        // Event listener for sending messages
-        sendButton.addEventListener('click', () => {
-            const userMessage = chatInput.value.trim();
-            if (userMessage) {
-                displayMessage(userMessage, 'user-message');
-                chatInput.value = '';
-
-                // Get bot response based on the JSON data
-                const botResponse = getBotResponse(userMessage);
-                displayMessage(botResponse, 'bot-message');
-            }
-        });
-
-        // Display message function
-        function displayMessage(message, classType) {
-            const messageElement = document.createElement('div');
-            messageElement.classList.add('chat-message', classType);
-            messageElement.innerText = message;
-            chatBody.appendChild(messageElement);
-            chatBody.scrollTop = chatBody.scrollHeight;
+    function displayMessage(message, classType, isHTML = false) {
+        const messageElement = document.createElement('div');
+        messageElement.classList.add('chat-message', classType);
+        if (isHTML) {
+            messageElement.innerHTML = message;  
+        } else {
+            messageElement.innerText = message;  
         }
+        document.getElementById('chatBody').appendChild(messageElement);
+        document.getElementById('chatBody').scrollTop = document.getElementById('chatBody').scrollHeight;
+    }
 
-        // Get bot response based on input
-        function getBotResponse(input) {
-            const normalizedInput = input.trim().toLowerCase();  // Trim and convert to lowercase
-
-            // Check if the input matches a predefined response
-            return chatbotResponses[normalizedInput] || chatbotResponses["default"];
+    document.getElementById('sendButton').addEventListener('click', () => {
+        const userMessage = document.getElementById('chatInput').value.trim();
+        if (userMessage) {
+            displayMessage(userMessage, 'user-message');
+            document.getElementById('chatInput').value = '';
+            const botResponse = chatbotResponses[userMessage.toLowerCase()] || chatbotResponses["default"];
+            displayMessage(botResponse, 'bot-message', true);
         }
-    </script>
+    });
+
+    document.getElementById('chatInput').addEventListener('keypress', function(event) {
+        if (event.key === "Enter") {
+            document.getElementById('sendButton').click();
+        }
+    });
+</script>
+
 </body>
 </html>
